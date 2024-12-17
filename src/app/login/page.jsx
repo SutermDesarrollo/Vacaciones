@@ -1,21 +1,16 @@
 "use client";
-import { Grid, Checkbox, Container, Link, Typography } from "@mui/material";
+import { Checkbox, Container, Grid, Typography } from "@mui/material";
 import * as Yup from "yup";
-import { Formik, Form } from "formik";
-import TextField from "../../ui/Forms/TextField";
-import Select from "../../ui/Forms/Select";
-import Button from "../../ui/Forms/Button";
-import areas from "../../data/areas.json";
-import { useState } from "react";
+import { Form, Formik } from "formik";
+import TextField from "../ui/forms/TextField";
+import Button from "../ui/forms/Button";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import supabase from "../utils/supabaseClient";
 
 const INITIAL_FORM_STATE = {
   rpe: "",
-  firstName: "",
-  lastName: "",
-  email: "",
   password: "",
-  area: "",
 };
 
 const FORM_VALIDATION = Yup.object().shape({
@@ -23,24 +18,23 @@ const FORM_VALIDATION = Yup.object().shape({
     .required("Required")
     .min(5, "Must be exactly 5 digits")
     .max(5, "Must be exactly 5 digits"),
-  firstName: Yup.string().required("Required"),
-  lastName: Yup.string().required("Required"),
-  email: Yup.string().email("Invalid email").required("Required"),
   password: Yup.string().required("Required"),
-  area: Yup.string().required("Required"),
 });
 
-function Page() {
+const { data, error } = await supabase.from("countries").select();
+console.log(data, error);
+
+function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
 
-  const handleSubmit = (values) => {
-    router.push("/agenda");
+  const handleSubmit = async (values) => {
+    console.log("Valores: ", values);
   };
 
   return (
-    <Container sx={{ marginTop: "3rem" }}>
+    <Container sx={{ marginTop: "1rem" }}>
       <Formik
         initialValues={{ ...INITIAL_FORM_STATE }}
         validationSchema={FORM_VALIDATION}
@@ -49,23 +43,11 @@ function Page() {
         <Form>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <Typography>Registrar Usuario</Typography>
+              <Typography>Iniciar Sesión</Typography>
             </Grid>
 
             <Grid item xs={12}>
               <TextField name="rpe" label="RPE" />
-            </Grid>
-
-            <Grid item xs={6}>
-              <TextField name="firstName" label="First Name" />
-            </Grid>
-
-            <Grid item xs={6}>
-              <TextField name="lastName" label="Last Name" />
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField name="email" label="Correo Electronico" />
             </Grid>
 
             <Grid item xs={12}>
@@ -86,23 +68,13 @@ function Page() {
             </Grid>
 
             <Grid item xs={12}>
-              <Select name="area" label="Area" options={areas} />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Button>Registrar</Button>
+              <Button>Iniciar</Button>
             </Grid>
           </Grid>
         </Form>
       </Formik>
-      <Typography sx={{ marginTop: "1rem" }}>
-        ¿Ya tienes cuenta?-
-        <Link href="/auth/login" underline="hover">
-          Inicia sesión
-        </Link>
-      </Typography>
     </Container>
   );
 }
 
-export default Page;
+export default LoginPage;

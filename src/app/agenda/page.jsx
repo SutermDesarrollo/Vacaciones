@@ -2,8 +2,8 @@
 import { Grid, Container, Typography } from "@mui/material";
 import * as Yup from "yup";
 import { Formik, Form } from "formik";
-import TextField from "../ui/Forms/TextField";
-import Button from "../ui/Forms/Button";
+import TextField from "../ui/forms/TextField";
+import Button from "../ui/forms/Button";
 import NumberLabel from "../ui/components/NumberLabel";
 import { DateCalendar } from "@mui/x-date-pickers";
 
