@@ -13,11 +13,11 @@ function page() {
       }}
     >
       Landing Page
-      <Link href="/auth/login" underline="hover">
+      <Link href="/login" underline="hover">
         Iniciar Sesion
       </Link>
-      <Link href="/auth/register" underline="hover">
-        Crear cuenta
+      <Link href="/agenda" underline="hover">
+        Agenda
       </Link>
     </Container>
   );

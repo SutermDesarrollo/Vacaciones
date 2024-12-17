@@ -4,34 +4,60 @@ import * as Yup from "yup";
 import { Formik, Form } from "formik";
 import TextField from "../ui/forms/TextField";
 import Button from "../ui/forms/Button";
+import Select from "../ui/forms/Select";
 import NumberLabel from "../ui/components/NumberLabel";
 import { DateCalendar } from "@mui/x-date-pickers";
 
+import DateTimePicker from "../ui/forms/DateTimePicker";
+import { getUserFromLocalStorage } from "../utils/userLocalStorage";
+import toast from "react-hot-toast";
+import supabase from "../utils/supabaseClient";
+import { useEffect, useState } from "react";
+
 const INITIAL_FORM_STATE = {
-  motive: "",
+  motivo: "",
+  diaInicio: "",
+  diaFin: "",
 };
 
 const FORM_VALIDATION = Yup.object().shape({
-  motive: Yup.string().required("Required"),
+  motivo: Yup.string().required("Required"),
+  diaInicio: Yup.date().required("Required"),
+  diaFin: Yup.date().required("Required"),
 });
 
-const formatDate = (date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
+const handleSubmit = async ({ motivo, diaInicio, diaFin }) => {
+  const user = getUserFromLocalStorage();
+  if (user) {
+    const { error } = await supabase.from("propuestas").insert({
+      motivo: motivo,
+      fecha_inicio: diaInicio,
+      fecha_fin: diaFin,
+      rpe_usuario: user.RPE,
+    });
+    if (error) {
+      console.log(error);
+    }
+    toast.success("Propuesta Enviada");
+  } else {
+    toast.error("Ocurrió un error");
+  }
 };
 
 function page() {
+  const [usuario, setUsuario] = useState({
+    dias_disponibles: 0,
+    dias_nuevos: 0,
+  });
+  useEffect(() => {
+    setUsuario(getUserFromLocalStorage);
+  }, []);
   return (
-    <Container sx={{ marginTop: "3rem", backgroundColor: "#202020" }}>
+    <Container sx={{ backgroundColor: "#202020" }}>
       <Formik
         initialValues={{ ...INITIAL_FORM_STATE }}
         validationSchema={FORM_VALIDATION}
-        onSubmit={(values) => {
-          console.log(values);
-        }}
+        onSubmit={handleSubmit}
       >
         <Form>
           <Grid
@@ -48,9 +74,15 @@ function page() {
                 justifyContent: "space-around",
               }}
             >
-              <NumberLabel number={27} label={"Dias Disponibles"} />
-              <NumberLabel number={14} label={"Dias Nuevos"} />
-              <NumberLabel number={8} label={"Dias Solicitados"} />
+              <NumberLabel
+                number={usuario.dias_disponibles}
+                label={"Dias Disponibles"}
+              />
+              <NumberLabel
+                number={usuario.dias_disponibles}
+                label={"Dias Nuevos"}
+              />
+              <NumberLabel number={0} label={"Dias Solicitados"} />
             </Grid>
 
             <Grid item xs={8}>
@@ -59,23 +91,13 @@ function page() {
                   <Typography>Solicitar Vacaciones</Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <TextField name="motive" label="Motivo" />
+                  <TextField name="motivo" label="Motivo" />
                 </Grid>
                 <Grid item xs={6}>
-                  <TextField
-                    name="date"
-                    label="Fecha Inicio"
-                    type="date"
-                    defaultValue={formatDate(new Date())}
-                  />
+                  <DateTimePicker name="diaInicio" label="Dia Inicio" />
                 </Grid>
                 <Grid item xs={6}>
-                  <TextField
-                    name="date"
-                    label="Fecha Inicio"
-                    type="date"
-                    defaultValue={formatDate(new Date())}
-                  />
+                  <DateTimePicker name="diaFin" label="Dia fin" />
                 </Grid>
                 <Grid item xs={12}>
                   <Button>Solicitar</Button>

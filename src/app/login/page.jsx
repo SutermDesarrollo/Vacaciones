@@ -7,6 +7,9 @@ import Button from "../ui/forms/Button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import supabase from "../utils/supabaseClient";
+import toast from "react-hot-toast";
+
+import { SiteData } from "../ui/ClientProvider";
 
 const INITIAL_FORM_STATE = {
   rpe: "",
@@ -21,16 +24,28 @@ const FORM_VALIDATION = Yup.object().shape({
   password: Yup.string().required("Required"),
 });
 
-const { data, error } = await supabase.from("countries").select();
-console.log(data, error);
-
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const { handleLogin } = SiteData();
 
   const router = useRouter();
 
-  const handleSubmit = async (values) => {
-    console.log("Valores: ", values);
+  const handleSubmit = async ({ rpe, password }) => {
+    const { data, error } = await supabase
+      .from("usuarios")
+      .select(
+        "RPE,nombre,antiguedad,area,dias_disponibles,dias_nuevos,tipo_usuario"
+      )
+      .eq("RPE", rpe)
+      .eq("contrasena", password)
+      .single();
+
+    if (data) {
+      handleLogin(data);
+    } else {
+      toast.error("Credenciales incorrectas");
+      console.log(error);
+    }
   };
 
   return (
@@ -43,7 +58,7 @@ function LoginPage() {
         <Form>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-            <Typography>SUTEM Seccion 102</Typography>
+              <Typography>SUTEM Seccion 102</Typography>
               <Typography>Iniciar Sesión</Typography>
             </Grid>
 
