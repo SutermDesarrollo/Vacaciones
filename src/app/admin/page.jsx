@@ -3,7 +3,13 @@ import Link from "next/link";
 
 function Page() {
   return (
-    <Container sx={{ marginTop: "3rem" }}>
+    <Container
+      sx={{
+        height: "100vh",
+        paddingTop: "1rem",
+        backgroundColor: "whitesmoke",
+      }}
+    >
       <Typography>Panel de Admin</Typography>
       <nav style={{ display: "flex", flexDirection: "column" }}>
         <Link href={"/admin"}>Dashboard</Link>

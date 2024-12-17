@@ -49,7 +49,13 @@ function LoginPage() {
   };
 
   return (
-    <Container sx={{ marginTop: "1rem" }}>
+    <Container
+      sx={{
+        height: "100vh",
+        paddingTop: "1rem",
+        backgroundColor: "whitesmoke",
+      }}
+    >
       <Formik
         initialValues={{ ...INITIAL_FORM_STATE }}
         validationSchema={FORM_VALIDATION}
@@ -76,7 +82,7 @@ function LoginPage() {
 
             <Grid item xs={12}>
               <Checkbox
-                sx={{ color: "whitesmoke" }}
+                sx={{ color: "#0a0a0a" }}
                 checked={showPassword}
                 onChange={() => setShowPassword(!showPassword)}
               />

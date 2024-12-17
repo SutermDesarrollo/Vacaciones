@@ -31,16 +31,16 @@ const SelectWrapper = ({ name, options, ...otherProps }) => {
       sx={{
         // Root class for the input field
         "& .MuiOutlinedInput-root": {
-          color: "whitesmoke",
+          color: "#0a0a0a",
           // Class for the border around the input field
           "& .MuiOutlinedInput-notchedOutline": {
-            borderColor: "whitesmoke",
+            borderColor: "#0a0a0a",
             borderWidth: "1px",
           },
         },
         // Class for the label of the input field
         "& .MuiInputLabel-outlined": {
-          color: "whitesmoke",
+          color: "#0a0a0a",
         },
       }}
       {...configSelect}

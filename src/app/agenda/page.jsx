@@ -53,7 +53,13 @@ function page() {
     setUsuario(getUserFromLocalStorage);
   }, []);
   return (
-    <Container sx={{ backgroundColor: "#202020" }}>
+    <Container
+      sx={{
+        height: "100vh",
+        paddingTop: "1rem",
+        backgroundColor: "whitesmoke",
+      }}
+    >
       <Formik
         initialValues={{ ...INITIAL_FORM_STATE }}
         validationSchema={FORM_VALIDATION}
@@ -78,10 +84,7 @@ function page() {
                 number={usuario.dias_disponibles}
                 label={"Dias Disponibles"}
               />
-              <NumberLabel
-                number={usuario.dias_disponibles}
-                label={"Dias Nuevos"}
-              />
+              <NumberLabel number={usuario.dias_nuevos} label={"Dias Nuevos"} />
               <NumberLabel number={0} label={"Dias Solicitados"} />
             </Grid>
 
