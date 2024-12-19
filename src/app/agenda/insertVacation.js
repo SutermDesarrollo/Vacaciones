@@ -1,6 +1,6 @@
 import supabase from "../utils/supabaseClient";
 import { calculateDateDifference } from "./contraints";
-import { updateDiasDisponibles } from "./updateFields/updateDiasDisponibles";
+import { updateDiasDisponibles } from "./updateFields/updateFields";
 
 export async function insertVacation(user, motivo, fechaInicio, fechaFin) {
   //==========Calcular dias que se restaran al campo dias_disponibles

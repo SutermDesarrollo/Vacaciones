@@ -1,10 +1,14 @@
 import { AppBar, Button, Link, Toolbar } from "@mui/material";
 import Logo from "../../../../../public/SutermLogo.png";
 import Image from "next/image";
-import { removeUserFromLocalStorage } from "../../../utils/userLocalStorage";
+import {
+  getUserFromLocalStorage,
+  removeUserFromLocalStorage,
+} from "../../../utils/userLocalStorage";
 import { SiteData } from "../../ClientProvider";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 function Header() {
   const { userState, setUserState } = SiteData();
@@ -17,6 +21,14 @@ function Header() {
     toast.success("Cerrando Sesion");
     router.push("/");
   };
+
+  const handleLogin = () => {
+    router.push("/login");
+  };
+
+  useEffect(() => {
+    setUserState(getUserFromLocalStorage());
+  }, []);
 
   return (
     <AppBar
@@ -40,7 +52,15 @@ function Header() {
           />
         </a>
         {userState ? <div>{userState.nombre}</div> : null}
-        {userState ? <Button onClick={handleLogout}>Logout</Button> : null}
+        {userState ? (
+          <Button variant="contained" onClick={handleLogout}>
+            Logout
+          </Button>
+        ) : (
+          <Button variant="contained" onClick={handleLogin}>
+            Login
+          </Button>
+        )}
       </Toolbar>
     </AppBar>
   );

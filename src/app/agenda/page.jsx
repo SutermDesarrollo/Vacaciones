@@ -1,5 +1,5 @@
 "use client";
-import { Grid, Container, Typography } from "@mui/material";
+import { Grid, Container, Typography, Button as Boton } from "@mui/material";
 import * as Yup from "yup";
 import { Formik, Form } from "formik";
 import TextField from "../ui/forms/TextField";
@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import { checkConstraints } from "./contraints";
 import { insertVacation } from "./insertVacation";
 import { SiteData } from "../ui/ClientProvider";
+import { useState, useEffect } from "react";
 
 const INITIAL_FORM_STATE = {
   motivo: "",
@@ -26,10 +27,40 @@ const FORM_VALIDATION = Yup.object().shape({
   fechaFin: Yup.date().required("Required"),
 });
 
+import { cerrarRegistro, siguienteEnLineaPorArea } from "./dbEntries";
+import { useRouter } from "next/navigation";
+
 function page() {
+  const [disabled, setDisabled] = useState(true);
+
+  //==============================Revisar antiguedad
+  useEffect(() => {
+    const fetchData = async () => {
+      const user = await getUserFromLocalStorage();
+      if (user) {
+        const siguienteEnLinea = await siguienteEnLineaPorArea(user.area);
+
+        if (siguienteEnLinea.RPE === user.RPE) {
+          toast.success("Ingresa tus solicitudes", { id: "success" });
+          setDisabled(false);
+        } else {
+          toast.error("Actualmente no puedes registrar", { id: "error1" });
+          toast.error(
+            `${siguienteEnLinea.nombre} está en proceso de registro`,
+            { id: "error2" }
+          );
+        }
+      } else {
+        toast.error("No estas registrado");
+      }
+    };
+    fetchData();
+  }, []);
+
   const { userState, setUserState } = SiteData();
 
   const handleSubmit = async ({ motivo, fechaInicio, fechaFin }) => {
+    const router = useRouter();
     const user = getUserFromLocalStorage();
 
     if (user) {
@@ -56,6 +87,14 @@ function page() {
     } else {
       toast.success("No estas logeado");
     }
+  };
+
+  const handleCerrarRegistro = async () => {
+    const user = getUserFromLocalStorage();
+
+    await cerrarRegistro(user.RPE);
+    toast.success("Se cerro tu registro correctamente");
+    router.push("/");
   };
 
   return (
@@ -103,16 +142,33 @@ function page() {
                   <Typography>Solicitar Vacaciones</Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <TextField name="motivo" label="Motivo" />
+                  <TextField name="motivo" label="Motivo" disabled={disabled} />
                 </Grid>
                 <Grid item xs={6}>
-                  <DateTimePicker name="fechaInicio" label="Dia Inicio" />
+                  <DateTimePicker
+                    name="fechaInicio"
+                    label="Dia Inicio"
+                    disabled={disabled}
+                  />
                 </Grid>
                 <Grid item xs={6}>
-                  <DateTimePicker name="fechaFin" label="Dia fin" />
+                  <DateTimePicker
+                    name="fechaFin"
+                    label="Dia fin"
+                    disabled={disabled}
+                  />
                 </Grid>
                 <Grid item xs={12}>
-                  <Button>Solicitar</Button>
+                  <Button disabled={disabled}>Solicitar</Button>
+                </Grid>
+                <Grid item xs={6}>
+                  <Boton
+                    variant="contained"
+                    disabled={disabled}
+                    onClick={handleCerrarRegistro}
+                  >
+                    Cerrar Registro
+                  </Boton>
                 </Grid>
               </Grid>
             </Grid>

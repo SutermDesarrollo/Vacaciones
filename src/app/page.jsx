@@ -14,9 +14,6 @@ function page() {
       }}
     >
       Landing Page
-      <Link href="/login" underline="hover">
-        Iniciar Sesion
-      </Link>
       <Link href="/agenda" underline="hover">
         Agenda
       </Link>
