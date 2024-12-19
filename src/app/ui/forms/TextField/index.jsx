@@ -1,6 +1,5 @@
 import { TextField } from "@mui/material";
 import { useField } from "formik";
-import React from "react";
 
 const TextFieldWrapper = ({ name, ...otherProps }) => {
   const [field, meta] = useField(name);
@@ -35,6 +34,7 @@ const TextFieldWrapper = ({ name, ...otherProps }) => {
         },
       }}
       {...configTextField}
+      inputProps={{ style: { textTransform: "uppercase" } }}
     />
   );
 };

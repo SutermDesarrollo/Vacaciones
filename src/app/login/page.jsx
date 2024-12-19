@@ -37,8 +37,8 @@ function LoginPage() {
       .select(
         "RPE,nombre,antiguedad,area,dias_disponibles,dias_nuevos,tipo_usuario"
       )
-      .eq("RPE", rpe)
-      .eq("contrasena", password)
+      .eq("RPE", rpe.toUpperCase())
+      .eq("contrasena", password.toUpperCase())
       .single();
 
     if (data) {
@@ -73,7 +73,11 @@ function LoginPage() {
             </Grid>
 
             <Grid item xs={12}>
-              <TextField name="rpe" label="RPE" />
+              <TextField
+                name="rpe"
+                label="RPE"
+                style={{ textTransform: "uppercase" }}
+              />
             </Grid>
 
             <Grid item xs={12}>

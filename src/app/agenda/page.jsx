@@ -11,9 +11,12 @@ import { getUserFromLocalStorage } from "../utils/userLocalStorage";
 import toast from "react-hot-toast";
 
 import { checkConstraints } from "./contraints";
-import { insertVacation } from "./insertVacation";
+import { insertNewVacation, insertVacation } from "./insertVacation";
 import { SiteData } from "../ui/ClientProvider";
 import { useState, useEffect } from "react";
+
+import { cerrarRegistro, siguienteEnLineaPorArea } from "./dbEntries";
+import { useRouter } from "next/navigation";
 
 const INITIAL_FORM_STATE = {
   motivo: "",
@@ -27,11 +30,10 @@ const FORM_VALIDATION = Yup.object().shape({
   fechaFin: Yup.date().required("Required"),
 });
 
-import { cerrarRegistro, siguienteEnLineaPorArea } from "./dbEntries";
-import { useRouter } from "next/navigation";
-
 function page() {
   const [disabled, setDisabled] = useState(true);
+  const { userState, setUserState } = SiteData();
+  const router = useRouter();
 
   //==============================Revisar antiguedad
   useEffect(() => {
@@ -51,16 +53,13 @@ function page() {
           );
         }
       } else {
-        toast.error("No estas registrado");
+        toast.error("No estas registrado", { id: "notLoggedIn" });
       }
     };
     fetchData();
   }, []);
 
-  const { userState, setUserState } = SiteData();
-
   const handleSubmit = async ({ motivo, fechaInicio, fechaFin }) => {
-    const router = useRouter();
     const user = getUserFromLocalStorage();
 
     if (user) {
@@ -72,9 +71,9 @@ function page() {
       );
       if (isValid) {
         try {
-          const updatedUser = await insertVacation(
+          const updatedUser = await insertNewVacation(
             user,
-            motivo,
+            motivo.toUpperCase(),
             fechaInicio,
             fechaFin
           );

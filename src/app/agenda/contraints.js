@@ -1,25 +1,23 @@
 import supabase from "../utils/supabaseClient";
 
+//====================Aplicar Restricciones
 export async function checkConstraints(user, motivo, diaInicio, diaFin) {
-  //===============Revisar si no ha llegado al limite de periodos
   const periodsConstraint = await checkMaxPeriods(user.RPE);
 
-  //===============Revisar si el periodo cabe en los dias disponibles
   const availableConstraint = await checkAvailableDays(
     user.RPE,
     diaInicio,
     diaFin
   );
 
-  //===============Si alguna restriccion da false, regresa false
   if (!periodsConstraint || !availableConstraint) {
     return false;
   }
 
-  //===============Si pasa las restricciones, regresa true
   return true;
 }
 
+//====================Restricciones
 export async function checkMaxPeriods(rpe) {
   const { data, error } = await supabase
     .from("propuestas")
@@ -35,6 +33,8 @@ export async function checkMaxPeriods(rpe) {
   }
   return true;
 }
+
+//====================Utils
 
 export async function checkAvailableDays(rpe, diaInicio, diaFin) {
   const { data, error } = await supabase
@@ -56,11 +56,6 @@ export async function checkAvailableDays(rpe, diaInicio, diaFin) {
   return true;
 }
 
-export function checkperiodSize() {
-  //<3 - cuenta a vacaciones
-  //>4 -
-}
-
 export function calculateDateDifference(fechaInicio, fechaFin) {
   const start = new Date(fechaInicio);
   const end = new Date(fechaFin);
@@ -76,4 +71,9 @@ export function calculateDateDifference(fechaInicio, fechaFin) {
 
   //Incluir ambos dias en el calculo
   return differenceInDays + 1;
+}
+
+export function checkperiodSize() {
+  //<3 - cuenta a vacaciones
+  //>4 -
 }
