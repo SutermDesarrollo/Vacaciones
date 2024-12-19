@@ -13,7 +13,7 @@ function page() {
         backgroundColor: "whitesmoke",
       }}
     >
-      Landing Page
+      Sistema de Propuesta de vacaciones
       <Link href="/agenda" underline="hover">
         Agenda
       </Link>
