@@ -9,6 +9,7 @@ import { useState } from "react";
 import supabase from "../utils/supabaseClient";
 import toast from "react-hot-toast";
 
+import { saveUserToLocalStorage } from "../utils/userLocalStorage";
 import { SiteData } from "../ui/ClientProvider";
 
 const INITIAL_FORM_STATE = {
@@ -25,8 +26,8 @@ const FORM_VALIDATION = Yup.object().shape({
 });
 
 function LoginPage() {
+  const { setUserState } = SiteData();
   const [showPassword, setShowPassword] = useState(false);
-  const { handleLogin } = SiteData();
 
   const router = useRouter();
 
@@ -41,7 +42,10 @@ function LoginPage() {
       .single();
 
     if (data) {
-      handleLogin(data);
+      saveUserToLocalStorage(data);
+      setUserState(data);
+      toast.success("Iniciando Sesion");
+      router.push("/agenda");
     } else {
       toast.error("Credenciales incorrectas");
       console.log(error);

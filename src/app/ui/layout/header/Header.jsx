@@ -1,19 +1,23 @@
 import { AppBar, Button, Link, Toolbar } from "@mui/material";
 import Logo from "../../../../../public/SutermLogo.png";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { getUserFromLocalStorage } from "../../../utils/userLocalStorage";
+import { removeUserFromLocalStorage } from "../../../utils/userLocalStorage";
 import { SiteData } from "../../ClientProvider";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 function Header() {
-  const { handleLogout } = SiteData();
-  const [user, setUser] = useState("");
-  useEffect(() => {
-    const user = getUserFromLocalStorage();
-    if (user) {
-      setUser(user);
-    }
-  }, []);
+  const { userState, setUserState } = SiteData();
+
+  const router = useRouter();
+
+  const handleLogout = () => {
+    removeUserFromLocalStorage();
+    setUserState(null);
+    toast.success("Cerrando Sesion");
+    router.push("/");
+  };
+
   return (
     <AppBar
       sx={{
@@ -35,8 +39,8 @@ function Header() {
             alt="Suterm"
           />
         </a>
-        {user ? <div>{user.nombre}</div> : null}
-        {user ? <Button onClick={handleLogout}>Logout</Button> : null}
+        {userState ? <div>{userState.nombre}</div> : null}
+        {userState ? <Button onClick={handleLogout}>Logout</Button> : null}
       </Toolbar>
     </AppBar>
   );

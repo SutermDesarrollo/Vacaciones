@@ -4,54 +4,60 @@ import * as Yup from "yup";
 import { Formik, Form } from "formik";
 import TextField from "../ui/forms/TextField";
 import Button from "../ui/forms/Button";
-import Select from "../ui/forms/Select";
 import NumberLabel from "../ui/components/NumberLabel";
-import { DateCalendar } from "@mui/x-date-pickers";
 
 import DateTimePicker from "../ui/forms/DateTimePicker";
 import { getUserFromLocalStorage } from "../utils/userLocalStorage";
 import toast from "react-hot-toast";
-import supabase from "../utils/supabaseClient";
-import { useEffect, useState } from "react";
+
+import { checkConstraints } from "./contraints";
+import { insertVacation } from "./insertVacation";
+import { SiteData } from "../ui/ClientProvider";
 
 const INITIAL_FORM_STATE = {
   motivo: "",
-  diaInicio: "",
-  diaFin: "",
+  fechaInicio: "",
+  fechaFin: "",
 };
 
 const FORM_VALIDATION = Yup.object().shape({
   motivo: Yup.string().required("Required"),
-  diaInicio: Yup.date().required("Required"),
-  diaFin: Yup.date().required("Required"),
+  fechaInicio: Yup.date().required("Required"),
+  fechaFin: Yup.date().required("Required"),
 });
 
-const handleSubmit = async ({ motivo, diaInicio, diaFin }) => {
-  const user = getUserFromLocalStorage();
-  if (user) {
-    const { error } = await supabase.from("propuestas").insert({
-      motivo: motivo,
-      fecha_inicio: diaInicio,
-      fecha_fin: diaFin,
-      rpe_usuario: user.RPE,
-    });
-    if (error) {
-      console.log(error);
-    }
-    toast.success("Propuesta Enviada");
-  } else {
-    toast.error("Ocurrió un error");
-  }
-};
-
 function page() {
-  const [usuario, setUsuario] = useState({
-    dias_disponibles: 0,
-    dias_nuevos: 0,
-  });
-  useEffect(() => {
-    setUsuario(getUserFromLocalStorage);
-  }, []);
+  const { userState, setUserState } = SiteData();
+
+  const handleSubmit = async ({ motivo, fechaInicio, fechaFin }) => {
+    const user = getUserFromLocalStorage();
+
+    if (user) {
+      const isValid = await checkConstraints(
+        user,
+        motivo,
+        fechaInicio,
+        fechaFin
+      );
+      if (isValid) {
+        try {
+          const updatedUser = await insertVacation(
+            user,
+            motivo,
+            fechaInicio,
+            fechaFin
+          );
+          setUserState(updatedUser);
+          toast.success("Propuesta Registrada");
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    } else {
+      toast.success("No estas logeado");
+    }
+  };
+
   return (
     <Container
       sx={{
@@ -81,10 +87,13 @@ function page() {
               }}
             >
               <NumberLabel
-                number={usuario.dias_disponibles}
+                number={userState ? userState.dias_disponibles : 0}
                 label={"Dias Disponibles"}
               />
-              <NumberLabel number={usuario.dias_nuevos} label={"Dias Nuevos"} />
+              <NumberLabel
+                number={userState ? userState.dias_nuevos : 0}
+                label={"Dias Nuevos"}
+              />
               <NumberLabel number={0} label={"Dias Solicitados"} />
             </Grid>
 
@@ -97,18 +106,15 @@ function page() {
                   <TextField name="motivo" label="Motivo" />
                 </Grid>
                 <Grid item xs={6}>
-                  <DateTimePicker name="diaInicio" label="Dia Inicio" />
+                  <DateTimePicker name="fechaInicio" label="Dia Inicio" />
                 </Grid>
                 <Grid item xs={6}>
-                  <DateTimePicker name="diaFin" label="Dia fin" />
+                  <DateTimePicker name="fechaFin" label="Dia fin" />
                 </Grid>
                 <Grid item xs={12}>
                   <Button>Solicitar</Button>
                 </Grid>
               </Grid>
-            </Grid>
-            <Grid item xs={12}>
-              <DateCalendar />
             </Grid>
           </Grid>
         </Form>
