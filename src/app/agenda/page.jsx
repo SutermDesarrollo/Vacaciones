@@ -115,13 +115,16 @@ function page() {
             spacing={2}
             sx={{ paddingLeft: "3rem", paddingRight: "3rem" }}
           >
+            <Grid item xs={12}>
+              <Typography>Solicitar Vacaciones</Typography>
+            </Grid>
             <Grid
               item
-              xs={4}
+              xs={12}
               sx={{
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "space-around",
+                gap: "1rem",
               }}
             >
               <NumberLabel
@@ -135,11 +138,8 @@ function page() {
               <NumberLabel number={0} label={"Dias Solicitados"} />
             </Grid>
 
-            <Grid item xs={8}>
+            <Grid item xs={12}>
               <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <Typography>Solicitar Vacaciones</Typography>
-                </Grid>
                 <Grid item xs={12}>
                   <TextField name="motivo" label="Motivo" disabled={disabled} />
                 </Grid>
