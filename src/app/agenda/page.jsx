@@ -11,7 +11,12 @@ import { getUserFromLocalStorage } from "../utils/userLocalStorage";
 import toast from "react-hot-toast";
 
 import { checkConstraints } from "./contraints";
-import { insertNewVacation, insertVacation } from "./insertVacation";
+import {
+  insertNewVacation,
+  insertVacation,
+  PRUEBA,
+  PruebaNuevos,
+} from "./insertVacation";
 import { SiteData } from "../ui/ClientProvider";
 import { useState, useEffect } from "react";
 
@@ -59,6 +64,7 @@ function page() {
     fetchData();
   }, []);
 
+  //==============================Entregar Propuesta
   const handleSubmit = async ({ motivo, fechaInicio, fechaFin }) => {
     const user = getUserFromLocalStorage();
 
@@ -81,6 +87,8 @@ function page() {
           toast.success("Propuesta Registrada");
         } catch (error) {
           console.log(error);
+          //No esta cayendo nada aqui
+          toast.error(error.message);
         }
       }
     } else {
@@ -94,6 +102,15 @@ function page() {
     await cerrarRegistro(user.RPE);
     toast.success("Se cerro tu registro correctamente");
     router.push("/");
+  };
+
+  const handlePrueba = async () => {
+    try {
+      console.log(await PRUEBA());
+      toast.success("bien");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -160,10 +177,11 @@ function page() {
                 <Grid item xs={12}>
                   <Button disabled={disabled}>Solicitar</Button>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12}>
                   <Boton
                     variant="contained"
                     disabled={disabled}
+                    fullWidth={true}
                     onClick={handleCerrarRegistro}
                   >
                     Cerrar Registro
@@ -174,6 +192,7 @@ function page() {
           </Grid>
         </Form>
       </Formik>
+      <button onClick={handlePrueba}>nuevos</button>
     </Container>
   );
 }

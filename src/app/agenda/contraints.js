@@ -4,13 +4,7 @@ import supabase from "../utils/supabaseClient";
 export async function checkConstraints(user, motivo, diaInicio, diaFin) {
   const periodsConstraint = await checkMaxPeriods(user.RPE);
 
-  const availableConstraint = await checkAvailableDays(
-    user.RPE,
-    diaInicio,
-    diaFin
-  );
-
-  if (!periodsConstraint || !availableConstraint) {
+  if (!periodsConstraint) {
     return false;
   }
 

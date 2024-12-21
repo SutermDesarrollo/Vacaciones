@@ -3,12 +3,16 @@ import {
   saveUserToLocalStorage,
 } from "../../utils/userLocalStorage";
 
-export function updateDiasDisponibles(nuevosDiasDisponibles) {
+export function updateDiasDisponiblesDiasNuevos(
+  nuevosDiasDisponibles,
+  nuevosDiasNuevos
+) {
   const user = getUserFromLocalStorage();
 
   if (user) {
     //Cambios en localStorage
     user.dias_disponibles = nuevosDiasDisponibles;
+    user.dias_nuevos = nuevosDiasNuevos;
     saveUserToLocalStorage(user);
 
     //Cambios en Estado de React
