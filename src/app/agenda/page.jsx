@@ -106,15 +106,6 @@ function page() {
     router.push("/");
   };
 
-  const handlePrueba = async () => {
-    const user = getUserFromLocalStorage();
-    const fechaInicio = "2025-05-09";
-    const fechaFin = "2025-05-12";
-
-    const isValid = await revisarDisponibilidad(user, fechaInicio, fechaFin);
-    console.log(isValid);
-  };
-
   return (
     <Container
       sx={{
@@ -196,7 +187,6 @@ function page() {
         </Form>
       </Formik>
       <TermsList />
-      <button onClick={handlePrueba}>hola</button>
     </Container>
   );
 }
