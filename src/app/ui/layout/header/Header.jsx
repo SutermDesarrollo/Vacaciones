@@ -9,6 +9,7 @@ import { SiteData } from "../../ClientProvider";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { orange } from "@mui/material/colors";
 
 function Header() {
   const { userState, setUserState } = SiteData();
@@ -51,7 +52,9 @@ function Header() {
             alt="Suterm"
           />
         </a>
-        {userState ? <div>{userState.nombre}</div> : null}
+        {userState ? (
+          <div style={{ textAlign: "center" }}>{userState.nombre}</div>
+        ) : null}
         {userState ? (
           <Button variant="contained" onClick={handleLogout}>
             Logout

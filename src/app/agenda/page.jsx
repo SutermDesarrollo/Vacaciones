@@ -5,18 +5,15 @@ import { Formik, Form } from "formik";
 import TextField from "../ui/forms/TextField";
 import Button from "../ui/forms/Button";
 import NumberLabel from "../ui/components/NumberLabel";
+import TermsList from "../ui/components/TermsList";
 
 import DateTimePicker from "../ui/forms/DateTimePicker";
 import { getUserFromLocalStorage } from "../utils/userLocalStorage";
 import toast from "react-hot-toast";
 
-import { checkConstraints } from "./contraints";
-import {
-  insertNewVacation,
-  insertVacation,
-  PRUEBA,
-  PruebaNuevos,
-} from "./insertVacation";
+import { revisarPeriodos } from "./contraints";
+import { revisarDisponibilidad } from "./constraints2";
+import { insertNewVacation } from "./insertVacation";
 import { SiteData } from "../ui/ClientProvider";
 import { useState, useEffect } from "react";
 
@@ -69,13 +66,19 @@ function page() {
     const user = getUserFromLocalStorage();
 
     if (user) {
-      const isValid = await checkConstraints(
+      const isValid = await revisarPeriodos(
         user,
         motivo,
         fechaInicio,
         fechaFin
       );
-      if (isValid) {
+      const isAvailable = await revisarDisponibilidad(
+        user,
+        fechaInicio,
+        fechaFin
+      );
+
+      if (isValid && isAvailable) {
         try {
           const updatedUser = await insertNewVacation(
             user,
@@ -87,7 +90,6 @@ function page() {
           toast.success("Propuesta Registrada");
         } catch (error) {
           console.log(error);
-          //No esta cayendo nada aqui
           toast.error(error.message);
         }
       }
@@ -105,18 +107,18 @@ function page() {
   };
 
   const handlePrueba = async () => {
-    try {
-      console.log(await PRUEBA());
-      toast.success("bien");
-    } catch (error) {
-      toast.error(error.message);
-    }
+    const user = getUserFromLocalStorage();
+    const fechaInicio = "2025-05-09";
+    const fechaFin = "2025-05-12";
+
+    const isValid = await revisarDisponibilidad(user, fechaInicio, fechaFin);
+    console.log(isValid);
   };
 
   return (
     <Container
       sx={{
-        height: "100vh",
+        height: "100%",
         paddingTop: "1rem",
         backgroundColor: "whitesmoke",
       }}
@@ -183,6 +185,7 @@ function page() {
                     disabled={disabled}
                     fullWidth={true}
                     onClick={handleCerrarRegistro}
+                    sx={{ backgroundColor: "#745cd0" }}
                   >
                     Cerrar Registro
                   </Boton>
@@ -192,7 +195,8 @@ function page() {
           </Grid>
         </Form>
       </Formik>
-      <button onClick={handlePrueba}>nuevos</button>
+      <TermsList />
+      <button onClick={handlePrueba}>hola</button>
     </Container>
   );
 }

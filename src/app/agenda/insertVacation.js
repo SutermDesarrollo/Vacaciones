@@ -87,6 +87,8 @@ export async function insertNewVacation(user, motivo, fechaInicio, fechaFin) {
       fecha_inicio: fechaInicio,
       fecha_fin: fechaFin,
       rpe_usuario: user.RPE,
+      disponibles_consumidos: diasDescontadosDeDisponibles,
+      nuevos_consumidos: diasDescontadosDeNuevos,
     });
     if (insertError) {
       throw new Error({ message: "Error en BD" });
@@ -171,26 +173,6 @@ export async function calcularDiasNuevosDiasDisponibles(
     }
 
     return { diasDescontadosDeDisponibles, diasDescontadosDeNuevos };
-  } catch (error) {
-    throw error;
-  }
-}
-
-//PRUEBA
-export async function PRUEBA() {
-  try {
-    const hola = PRUEBA2();
-
-    return hola;
-  } catch (error) {
-    throw error;
-  }
-}
-
-export async function PRUEBA2() {
-  try {
-    if ("hola" === "holaa") return 3;
-    else throw new Error("Error en prueba2");
   } catch (error) {
     throw error;
   }
