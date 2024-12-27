@@ -186,7 +186,7 @@ function page() {
           </Grid>
         </Form>
       </Formik>
-      {/* <TermsList /> */}
+      <TermsList />
     </Container>
   );
 }

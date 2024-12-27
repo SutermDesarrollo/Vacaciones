@@ -15,15 +15,14 @@ import { SiteData } from "../ClientProvider";
 export default function TermsList() {
   const [solicitudes, setSolicitudes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const user = getUserFromLocalStorage();
+  const { userState } = SiteData();
 
   const fetchSolicitudes = async () => {
-    const user = getUserFromLocalStorage();
     try {
       const { data, error } = await supabase
         .from("propuestas")
         .select()
-        .eq("rpe_usuario", user.RPE);
+        .eq("rpe_usuario", userState.RPE);
       if (error) {
         throw new Error("Error en BD");
       }
