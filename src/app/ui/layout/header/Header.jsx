@@ -1,3 +1,4 @@
+"use client"
 import { AppBar, Button, Link, Toolbar } from "@mui/material";
 import Logo from "../../../../../public/SutermLogo.png";
 import Image from "next/image";
@@ -9,7 +10,6 @@ import { SiteData } from "../../ClientProvider";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { orange } from "@mui/material/colors";
 
 function Header() {
   const { userState, setUserState } = SiteData();

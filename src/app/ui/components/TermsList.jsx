@@ -1,3 +1,4 @@
+"use client";
 import supabase from "../../utils/supabaseClient";
 import {
   getUserFromLocalStorage,
