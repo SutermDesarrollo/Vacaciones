@@ -107,6 +107,15 @@ const TermCard = ({ Term, fetchSolicitudes }) => {
     saveUserToLocalStorage(user);
     setUserState(user);
 
+    //Actualizar BD
+    const { error: updateError } = await supabase
+      .from("usuarios")
+      .update({
+        dias_disponibles: user.dias_disponibles,
+        dias_nuevos: user.dias_nuevos,
+      })
+      .eq("RPE", user.RPE);
+
     //Actualizar lista y notificar
     fetchSolicitudes();
     toast.success("Propuesta eliminada");
