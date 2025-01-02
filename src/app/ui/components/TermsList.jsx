@@ -1,28 +1,27 @@
 "use client";
 import supabase from "../../utils/supabaseClient";
-import {
-  getUserFromLocalStorage,
-  saveUserToLocalStorage,
-} from "../../utils/userLocalStorage";
+import { getUserFromLocalStorage } from "../../utils/userLocalStorage";
 import React, { useEffect, useState } from "react";
 
-import { TbArrowBigRightLines } from "react-icons/tb";
-import { Box, IconButton } from "@mui/material";
-import { RiEdit2Line, RiDeleteBin5Line } from "react-icons/ri";
-import toast from "react-hot-toast";
-import { SiteData } from "../ClientProvider";
+import dayjs from "dayjs";
+import "dayjs/locale/es";
+dayjs.locale("es");
+import { FaArrowRightLong } from "react-icons/fa6";
+import { FcCalendar } from "react-icons/fc";
+
+import OptionsMenu from "../components/OptionsMenu";
 
 export default function TermsList() {
   const [solicitudes, setSolicitudes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { userState } = SiteData();
 
   const fetchSolicitudes = async () => {
+    const user = await getUserFromLocalStorage();
     try {
       const { data, error } = await supabase
         .from("propuestas")
         .select()
-        .eq("rpe_usuario", userState.RPE);
+        .eq("rpe_usuario", user.RPE);
       if (error) {
         throw new Error("Error en BD");
       }
@@ -49,11 +48,7 @@ export default function TermsList() {
   }, []);
 
   return (
-    <div
-      style={{
-        textAlign: "center",
-      }}
-    >
+    <>
       {isLoading ? (
         <p>Cargando...</p>
       ) : (
@@ -61,91 +56,69 @@ export default function TermsList() {
           style={{
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
             gap: "1rem",
-            margin: "1rem",
           }}
         >
-          {solicitudes.map((element, index) => (
-            <TermCard
-              Term={element}
-              key={index}
-              fetchSolicitudes={fetchSolicitudes}
-            />
-          ))}
+          {solicitudes.length > 0 ? (
+            <>
+              Solicitudes
+              {solicitudes.map((element, index) => (
+                <div
+                  key={index}
+                  style={{
+                    backgroundColor: "#745cd0",
+                    borderRadius: "4px",
+                    padding: ".5rem",
+                  }}
+                >
+                  <TermCard
+                    index={index}
+                    Term={element}
+                    fetchSolicitudes={fetchSolicitudes}
+                  />
+                </div>
+              ))}
+            </>
+          ) : null}
         </div>
       )}
-    </div>
+    </>
   );
 }
 
 const TermCard = ({ Term, fetchSolicitudes }) => {
-  const { setUserState } = SiteData();
-
-  const handleDelete = async (id) => {
-    //Recuperar antes de eliminar
-    const { data, error } = await supabase
-      .from("propuestas")
-      .select()
-      .eq("id_propuesta", id)
-      .single();
-    if (error) {
-      console.log(error);
-    }
-
-    //Eliminar
-    const response = await supabase
-      .from("propuestas")
-      .delete()
-      .eq("id_propuesta", id);
-
-    //Actualizar campos
-    const user = getUserFromLocalStorage();
-    user.dias_disponibles = user.dias_disponibles + data.disponibles_consumidos;
-    user.dias_nuevos = user.dias_nuevos + data.nuevos_consumidos;
-    saveUserToLocalStorage(user);
-    setUserState(user);
-
-    //Actualizar BD
-    const { error: updateError } = await supabase
-      .from("usuarios")
-      .update({
-        dias_disponibles: user.dias_disponibles,
-        dias_nuevos: user.dias_nuevos,
-      })
-      .eq("RPE", user.RPE);
-
-    //Actualizar lista y notificar
-    fetchSolicitudes();
-    toast.success("Propuesta eliminada");
-  };
-
   return (
-    <Box
+    <div
       style={{
         display: "flex",
-        flexDirection: "column",
-        padding: "4px",
-        width: "300px",
-        border: "2px solid #D3D3D3",
-        backgroundColor: "#D3D3D3",
-        borderRadius: "8px",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        color: "whitesmoke",
       }}
     >
-      <div>{Term.motivo}</div>
       <div>
-        {Term.fecha_inicio} <TbArrowBigRightLines /> {Term.fecha_fin}
-      </div>
-      <div>
-        <IconButton
-          aria-label="trash"
-          onClick={() => handleDelete(Term.id_propuesta)}
-          sx={{ color: "red" }}
+        <div>{Term.motivo}</div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: "1rem",
+          }}
         >
-          <RiDeleteBin5Line />
-        </IconButton>
+          <FcCalendar />
+          {dayjs(Term.fecha_inicio).format("D-MMM")}
+          <FaArrowRightLong />
+          {dayjs(Term.fecha_fin).format("D-MMM")}
+        </div>
       </div>
-    </Box>
+
+      <div>
+        <OptionsMenu
+          id={Term.id_propuesta}
+          fetchSolicitudes={fetchSolicitudes}
+        />
+      </div>
+    </div>
   );
 };

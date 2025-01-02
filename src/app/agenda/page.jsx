@@ -2,10 +2,11 @@
 import { Grid, Container, Typography, Button as Boton } from "@mui/material";
 import * as Yup from "yup";
 import { Formik, Form } from "formik";
-import TextField from "../ui/forms/TextField";
 import Button from "../ui/forms/Button";
-import NumberLabel from "../ui/components/NumberLabel";
+import Select from "../ui/forms/Select";
+import DisplayValues from "../ui/components/DisplayValues";
 import TermsList from "../ui/components/TermsList";
+import data from "../data/motivos.json";
 
 import DateTimePicker from "../ui/forms/DateTimePicker";
 import { getUserFromLocalStorage } from "../utils/userLocalStorage";
@@ -19,6 +20,11 @@ import { useState, useEffect } from "react";
 
 import { cerrarRegistro, siguienteEnLineaPorArea } from "./dbEntries";
 import { useRouter } from "next/navigation";
+
+import dayjs from "dayjs";
+import "dayjs/locale/es";
+import Calendar from "../ui/components/Calendar";
+dayjs.locale("es");
 
 const INITIAL_FORM_STATE = {
   motivo: "",
@@ -50,7 +56,7 @@ function page() {
         } else {
           toast.error("Actualmente no puedes registrar", { id: "error1" });
           toast.error(
-            `${siguienteEnLinea.nombre} está en proceso de registro`,
+            `${siguienteEnLinea.nombre} del area: ${siguienteEnLinea.area} está en proceso de registro`,
             { id: "error2" }
           );
         }
@@ -82,7 +88,7 @@ function page() {
         try {
           const updatedUser = await insertNewVacation(
             user,
-            motivo.toUpperCase(),
+            motivo,
             fechaInicio,
             fechaFin
           );
@@ -95,15 +101,22 @@ function page() {
       }
     } else {
       toast.success("No estas logeado");
+      router.push("/login");
     }
   };
 
   const handleCerrarRegistro = async () => {
-    const user = getUserFromLocalStorage();
+    const userConfirmed = window.confirm(
+      "¿Cerrar el registro? Una vez cerrado no podrás hacer más acciones"
+    );
 
-    await cerrarRegistro(user.RPE);
-    toast.success("Se cerro tu registro correctamente");
-    router.push("/");
+    if (userConfirmed) {
+      const user = getUserFromLocalStorage();
+
+      await cerrarRegistro(user.RPE);
+      toast.success("Se cerro tu registro correctamente");
+      router.push("/");
+    }
   };
 
   return (
@@ -112,81 +125,82 @@ function page() {
         height: "100%",
         paddingTop: "1rem",
         backgroundColor: "whitesmoke",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
       }}
     >
+      <Typography variant="overline">Solicitar Vacaciones</Typography>
+
+      {userState ? (
+        <>
+          <Typography>Area: {userState.area}</Typography>
+          <Typography>
+            Fecha de Antiguedad: {dayjs(userState.antiguedad).format("DD-MMM")}
+          </Typography>
+        </>
+      ) : null}
+
+      <Grid container spacing={2}>
+        <DisplayValues />
+      </Grid>
+
       <Formik
         initialValues={{ ...INITIAL_FORM_STATE }}
         validationSchema={FORM_VALIDATION}
         onSubmit={handleSubmit}
       >
         <Form>
-          <Grid
-            container
-            spacing={2}
-            sx={{ paddingLeft: "3rem", paddingRight: "3rem" }}
-          >
+          <Grid container spacing={2} paddingY={"1rem"}>
             <Grid item xs={12}>
-              <Typography>Solicitar Vacaciones</Typography>
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "1rem",
-              }}
-            >
-              <NumberLabel
-                number={userState ? userState.dias_disponibles : 0}
-                label={"Dias Disponibles"}
+              {/* <TextField name="motivo" label="Motivo" disabled={disabled} /> */}
+              <Select
+                name="motivo"
+                label="Motivo"
+                disabled={disabled}
+                options={data}
               />
-              <NumberLabel
-                number={userState ? userState.dias_nuevos : 0}
-                label={"Dias Nuevos"}
-              />
-              <NumberLabel number={0} label={"Dias Solicitados"} />
             </Grid>
-
+            <Grid item xs={12} md={6}>
+              <DateTimePicker
+                name="fechaInicio"
+                label="Dia Inicio"
+                disabled={disabled}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <DateTimePicker
+                name="fechaFin"
+                label="Dia fin"
+                disabled={disabled}
+              />
+            </Grid>
             <Grid item xs={12}>
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <TextField name="motivo" label="Motivo" disabled={disabled} />
-                </Grid>
-                <Grid item xs={6}>
-                  <DateTimePicker
-                    name="fechaInicio"
-                    label="Dia Inicio"
-                    disabled={disabled}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <DateTimePicker
-                    name="fechaFin"
-                    label="Dia fin"
-                    disabled={disabled}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Button disabled={disabled}>Solicitar</Button>
-                </Grid>
-                <Grid item xs={12}>
-                  <Boton
-                    variant="contained"
-                    disabled={disabled}
-                    fullWidth={true}
-                    onClick={handleCerrarRegistro}
-                    sx={{ backgroundColor: "#745cd0" }}
-                  >
-                    Cerrar Registro
-                  </Boton>
-                </Grid>
-              </Grid>
+              <Button disabled={disabled}>Solicitar</Button>
             </Grid>
           </Grid>
         </Form>
       </Formik>
-      <TermsList />
+
+      <Grid container spacing={2}>
+        <Grid item xs={12} overflow={"auto"}>
+          <TermsList />
+        </Grid>
+        <Grid item xs={12}>
+          <Calendar />
+        </Grid>
+        <Grid item xs={12}>
+          <Boton
+            variant="contained"
+            disabled={disabled}
+            fullWidth={true}
+            onClick={handleCerrarRegistro}
+            sx={{ backgroundColor: "#745cd0" }}
+          >
+            Cerrar Registro
+          </Boton>
+        </Grid>
+      </Grid>
     </Container>
   );
 }

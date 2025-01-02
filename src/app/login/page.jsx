@@ -35,7 +35,7 @@ function LoginPage() {
     const { data, error } = await supabase
       .from("usuarios")
       .select(
-        "RPE,nombre,antiguedad,area,dias_disponibles,dias_nuevos,tipo_usuario"
+        "RPE,nombre,antiguedad,area,dias_disponibles,dias_nuevos,dias_solicitados,tipo_usuario"
       )
       .eq("RPE", rpe.toUpperCase())
       .eq("contrasena", password.toUpperCase())

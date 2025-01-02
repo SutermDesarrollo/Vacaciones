@@ -1,8 +1,5 @@
 "use client";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
-
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import DashboardLayout from "./layout/DashboardLayout";
 import { useState, createContext, useContext } from "react";
 
@@ -16,9 +13,7 @@ function ClientProvider({ children }) {
   return (
     <SiteContext.Provider value={{ userState, setUserState }}>
       <AppRouterCacheProvider>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DashboardLayout>{children}</DashboardLayout>
-        </LocalizationProvider>
+        <DashboardLayout>{children}</DashboardLayout>
       </AppRouterCacheProvider>
     </SiteContext.Provider>
   );

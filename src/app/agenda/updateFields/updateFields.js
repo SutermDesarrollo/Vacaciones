@@ -5,7 +5,8 @@ import {
 
 export function updateDiasDisponiblesDiasNuevos(
   nuevosDiasDisponibles,
-  nuevosDiasNuevos
+  nuevosDiasNuevos,
+  nuevosDiasSolicitados
 ) {
   const user = getUserFromLocalStorage();
 
@@ -13,6 +14,7 @@ export function updateDiasDisponiblesDiasNuevos(
     //Cambios en localStorage
     user.dias_disponibles = nuevosDiasDisponibles;
     user.dias_nuevos = nuevosDiasNuevos;
+    user.dias_solicitados = nuevosDiasSolicitados;
     saveUserToLocalStorage(user);
 
     //Cambios en Estado de React

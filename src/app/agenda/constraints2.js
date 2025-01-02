@@ -49,12 +49,15 @@ export async function revisarDisponibilidad(user, fechaInicio, fechaFin) {
 }
 
 //================================================VALIDACION
-function isFestividad(fecha, dias_festivos) {
-  for (const festivo of dias_festivos) {
-    if (dayjs(festivo.fecha).isSame(fecha)) {
-      return true;
+export function isFestividad(fecha, dias_festivos) {
+  if (dias_festivos.length > 0) {
+    for (const festivo of dias_festivos) {
+      if (dayjs(festivo.fecha).isSame(fecha)) {
+        return true;
+      }
     }
   }
+
   return false;
 }
 

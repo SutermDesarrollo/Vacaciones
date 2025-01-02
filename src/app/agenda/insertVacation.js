@@ -1,4 +1,5 @@
 import supabase from "../utils/supabaseClient";
+import { isFestividad } from "./constraints2";
 import { updateDiasDisponiblesDiasNuevos } from "./updateFields/updateFields";
 
 import dayjs from "dayjs";
@@ -20,9 +21,7 @@ export async function calcularDiasPorDescontar(
     let diaSemana = inicio.day(); // Obtiene el día de la semana (0 = domingo, 6 = sábado)
 
     // Verificamos si es un día festivo o de descanso
-    let esFestivo = diasFestivos.some((festivo) =>
-      dayjs(festivo.fecha).isSame(inicio, "day")
-    );
+    const esFestivo = await isFestividad(inicio, diasFestivos);
 
     let esDescanso = false;
     if (tipoRol == 1) {
@@ -43,7 +42,7 @@ export async function calcularDiasPorDescontar(
   return diasRestantes.length;
 }
 
-async function auxTipoRol(area) {
+export async function auxTipoRol(area) {
   try {
     const { data, error } = await supabase
       .from("areas")
@@ -61,12 +60,13 @@ async function auxTipoRol(area) {
   }
 }
 
-async function auxDiasFestivos() {
+export async function auxDiasFestivos(fechaInicio, fechaFin) {
   try {
     const { data, error } = await supabase
       .from("dias_festivos")
       .select()
-      .order("fecha", { ascending: true });
+      .gte("fecha", fechaInicio)
+      .lte("fecha", fechaFin);
     if (error) {
       throw new Error({ message: "Error en BD" });
     }
@@ -89,6 +89,10 @@ export async function insertNewVacation(user, motivo, fechaInicio, fechaFin) {
       rpe_usuario: user.RPE,
       disponibles_consumidos: diasDescontadosDeDisponibles,
       nuevos_consumidos: diasDescontadosDeNuevos,
+      tipo:
+        motivo == "Dias a Cuenta de Vacaciones"
+          ? "Cuenta de Vacaciones"
+          : "Periodo",
     });
     if (insertError) {
       throw new Error({ message: "Error en BD" });
@@ -100,6 +104,10 @@ export async function insertNewVacation(user, motivo, fechaInicio, fechaFin) {
       .update({
         dias_disponibles: user.dias_disponibles - diasDescontadosDeDisponibles,
         dias_nuevos: user.dias_nuevos - diasDescontadosDeNuevos,
+        dias_solicitados:
+          user.dias_solicitados +
+          diasDescontadosDeDisponibles +
+          diasDescontadosDeNuevos,
       })
       .eq("RPE", user.RPE);
 
@@ -108,7 +116,10 @@ export async function insertNewVacation(user, motivo, fechaInicio, fechaFin) {
     }
     const updatedUser = updateDiasDisponiblesDiasNuevos(
       user.dias_disponibles - diasDescontadosDeDisponibles,
-      user.dias_nuevos - diasDescontadosDeNuevos
+      user.dias_nuevos - diasDescontadosDeNuevos,
+      user.dias_solicitados +
+        diasDescontadosDeDisponibles +
+        diasDescontadosDeNuevos
     );
     return updatedUser;
   } catch (error) {
@@ -124,7 +135,7 @@ export async function calcularDiasNuevosDiasDisponibles(
   try {
     const tipoRol = await auxTipoRol(user.area);
 
-    const diasFestivos = await auxDiasFestivos();
+    const diasFestivos = await auxDiasFestivos(fechaInicio, fechaFin);
 
     const diasPorDescontar = await calcularDiasPorDescontar(
       fechaInicio,
