@@ -8,10 +8,10 @@ const SiteContext = createContext();
 export const SiteData = () => useContext(SiteContext);
 
 function ClientProvider({ children }) {
-  const [userState, setUserState] = useState(null);
+  const [userReact, setUserReact] = useState(null);
 
   return (
-    <SiteContext.Provider value={{ userState, setUserState }}>
+    <SiteContext.Provider value={{ userReact, setUserReact }}>
       <AppRouterCacheProvider>
         <DashboardLayout>{children}</DashboardLayout>
       </AppRouterCacheProvider>

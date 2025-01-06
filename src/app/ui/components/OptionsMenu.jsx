@@ -1,4 +1,11 @@
-import { IconButton, Menu, MenuItem } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Menu,
+  MenuItem,
+  Modal,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import { PiDotsThreeCircleVertical } from "react-icons/pi";
 import { RiEdit2Line, RiDeleteBin5Line } from "react-icons/ri";
@@ -10,8 +17,34 @@ import {
 import { SiteData } from "../ClientProvider";
 import toast from "react-hot-toast";
 
-export default function OptionsMenu({ id, fetchSolicitudes }) {
-  const { setUserState } = SiteData();
+import DateTimePicker from "../forms/DateTimePicker";
+import Button from "../forms/Button";
+import * as Yup from "yup";
+import { Formik, Form } from "formik";
+
+export default function OptionsMenu({
+  id,
+  motivo,
+  fechaInicio,
+  fechaFin,
+  fetchSolicitudes,
+}) {
+  // -- Yup Validation --------------------------------------------------------
+  const INITIAL_FORM_STATE = {
+    motivo: motivo,
+    fechaInicio: fechaInicio,
+    fechaFin: fechaFin,
+  };
+
+  const FORM_VALIDATION = Yup.object().shape({
+    motivo: Yup.string().required("Requerido"),
+    fechaInicio: Yup.date().required("Requerido"),
+    fechaFin: Yup.date()
+      .min(Yup.ref("fechaInicio"), "Dia Fin no puede ser antes de Dia Inicio")
+      .required("Requerido"),
+  });
+
+  const { setUserReact } = SiteData();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -55,7 +88,7 @@ export default function OptionsMenu({ id, fetchSolicitudes }) {
     user.dias_disponibles = user.dias_disponibles + data.disponibles_consumidos;
     user.dias_nuevos = user.dias_nuevos + data.nuevos_consumidos;
     saveUserToLocalStorage(user);
-    setUserState(user);
+    setUserReact(user);
 
     //Actualizar BD
     const { error: updateError } = await supabase
@@ -72,6 +105,26 @@ export default function OptionsMenu({ id, fetchSolicitudes }) {
     toast.success("Propuesta eliminada");
   };
 
+  //== Modal State ==========================================================
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleOpenModal = () => {
+    setOpenModal(true);
+    handleClose();
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  //== HandleSubmit =========================================================
+
+  const handleSubmit = async ({ motivo, fechaInicio, fechaFin }) => {
+    console.log(motivo);
+    console.log(fechaInicio);
+    console.log(fechaFin);
+  };
+
   return (
     <div>
       <IconButton
@@ -84,6 +137,7 @@ export default function OptionsMenu({ id, fetchSolicitudes }) {
       >
         <PiDotsThreeCircleVertical />
       </IconButton>
+
       <Menu
         id="demo-positioned-menu"
         aria-labelledby="demo-positioned-button"
@@ -91,22 +145,58 @@ export default function OptionsMenu({ id, fetchSolicitudes }) {
         open={open}
         onClose={handleClose}
         anchorOrigin={{
-          vertical: "top",
-          horizontal: "left",
+          vertical: "center",
+          horizontal: "right",
         }}
         transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
+          vertical: "center",
+          horizontal: "right",
         }}
       >
-        <MenuItem onClick={() => handleEditar(id)}>
-          <RiEdit2Line /> Editar
+        <MenuItem onClick={handleOpenModal}>
+          <RiEdit2Line />
+          Editar
         </MenuItem>
         <MenuItem onClick={() => handleEliminar(id)}>
           <RiDeleteBin5Line />
           Eliminar
         </MenuItem>
       </Menu>
+
+      <Modal
+        open={openModal}
+        onClose={handleCloseModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "white",
+            padding: "20px",
+            borderRadius: "8px",
+            boxShadow: 24,
+          }}
+        >
+          <Formik
+            initialValues={{ ...INITIAL_FORM_STATE }}
+            validationSchema={FORM_VALIDATION}
+            onSubmit={handleSubmit}
+          >
+            <Form
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
+              <Typography>{motivo}</Typography>
+              <DateTimePicker name="fechaInicio" label="Dia Inicio" />
+              <DateTimePicker name="fechaFin" label="Dia fin" />
+              <Button>Editar</Button>
+            </Form>
+          </Formik>
+        </Box>
+      </Modal>
     </div>
   );
 }

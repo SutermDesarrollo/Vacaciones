@@ -26,7 +26,7 @@ const FORM_VALIDATION = Yup.object().shape({
 });
 
 function LoginPage() {
-  const { setUserState } = SiteData();
+  const { setUserReact } = SiteData();
   const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
@@ -35,7 +35,7 @@ function LoginPage() {
     const { data, error } = await supabase
       .from("usuarios")
       .select(
-        "RPE,nombre,antiguedad,area,dias_disponibles,dias_nuevos,dias_solicitados,tipo_usuario"
+        "RPE,nombre,antiguedad,area,dias_disponibles,dias_nuevos,dias_solicitados"
       )
       .eq("RPE", rpe.toUpperCase())
       .eq("contrasena", password.toUpperCase())
@@ -43,7 +43,7 @@ function LoginPage() {
 
     if (data) {
       saveUserToLocalStorage(data);
-      setUserState(data);
+      setUserReact(data);
       toast.success("Iniciando Sesion");
       router.push("/agenda");
     } else {

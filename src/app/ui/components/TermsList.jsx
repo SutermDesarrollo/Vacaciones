@@ -116,6 +116,9 @@ const TermCard = ({ Term, fetchSolicitudes }) => {
       <div>
         <OptionsMenu
           id={Term.id_propuesta}
+          motivo={Term.motivo}
+          fechaInicio={Term.fecha_inicio}
+          fechaFin={Term.fecha_fin}
           fetchSolicitudes={fetchSolicitudes}
         />
       </div>

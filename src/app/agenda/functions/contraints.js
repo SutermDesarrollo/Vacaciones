@@ -1,10 +1,10 @@
 import toast from "react-hot-toast";
-import supabase from "../utils/supabaseClient";
+import { calcularDiasPorDescontar } from "./insertVacation";
 import {
   auxDiasFestivos,
   auxTipoRol,
-  calcularDiasPorDescontar,
-} from "./insertVacation";
+  maximoPeriodos,
+} from "./dbQuerys/dbEntries";
 
 //====================Aplicar Restricciones
 export async function revisarPeriodos(user, motivo, fechaInicio, fechaFin) {
@@ -27,7 +27,7 @@ export async function revisarPeriodos(user, motivo, fechaInicio, fechaFin) {
     }
   }
 
-  const periodsConstraint = await checkMaxPeriods(user.RPE);
+  const periodsConstraint = await maximoPeriodos(user.RPE);
 
   if (!periodsConstraint) {
     toast.error("No puedes registrar más de 4 periodos", {
@@ -36,23 +36,5 @@ export async function revisarPeriodos(user, motivo, fechaInicio, fechaFin) {
     return false;
   }
 
-  return true;
-}
-
-//====================Restricciones
-export async function checkMaxPeriods(rpe) {
-  const { data, error } = await supabase
-    .from("propuestas")
-    .select()
-    .eq("rpe_usuario", rpe)
-    .eq("tipo", "Periodo");
-
-  if (error) {
-    return false;
-  }
-
-  if (data.length >= 4) {
-    return false;
-  }
   return true;
 }

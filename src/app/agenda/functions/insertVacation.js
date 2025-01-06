@@ -1,8 +1,9 @@
-import supabase from "../utils/supabaseClient";
+import supabase from "../../utils/supabaseClient";
 import { isFestividad } from "./constraints2";
-import { updateDiasDisponiblesDiasNuevos } from "./updateFields/updateFields";
+import { updateDiasDisponiblesDiasNuevos } from "../updateFields/updateFields";
 
 import dayjs from "dayjs";
+import { auxDiasFestivos, auxTipoRol } from "./dbQuerys/dbEntries";
 
 export async function calcularDiasPorDescontar(
   fechaInicio,
@@ -42,41 +43,7 @@ export async function calcularDiasPorDescontar(
   return diasRestantes.length;
 }
 
-export async function auxTipoRol(area) {
-  try {
-    const { data, error } = await supabase
-      .from("areas")
-      .select()
-      .eq("nombre", area)
-      .single();
-
-    if (error) {
-      throw new Error({ message: "Error en BD" });
-    }
-
-    return data.rol_tipo;
-  } catch (error) {
-    throw error;
-  }
-}
-
-export async function auxDiasFestivos(fechaInicio, fechaFin) {
-  try {
-    const { data, error } = await supabase
-      .from("dias_festivos")
-      .select()
-      .gte("fecha", fechaInicio)
-      .lte("fecha", fechaFin);
-    if (error) {
-      throw new Error({ message: "Error en BD" });
-    }
-    return data;
-  } catch (error) {
-    throw error;
-  }
-}
-
-export async function insertNewVacation(user, motivo, fechaInicio, fechaFin) {
+export async function insertarPropuesta(user, motivo, fechaInicio, fechaFin) {
   try {
     const { diasDescontadosDeDisponibles, diasDescontadosDeNuevos } =
       await calcularDiasNuevosDiasDisponibles(user, fechaInicio, fechaFin);

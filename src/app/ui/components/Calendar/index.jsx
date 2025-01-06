@@ -46,8 +46,8 @@ function CalendarComponent() {
               fetchedPropuestas = fetchedPropuestas.concat(
                 propuestas.map((propuesta) => ({
                   title: usuario.nombre,
-                  start: new Date(propuesta.fecha_inicio),
-                  end: new Date(propuesta.fecha_fin),
+                  start: new Date(propuesta.fecha_inicio + "T00:00:00-06:00"),
+                  end: new Date(propuesta.fecha_fin + "T23:59:59-06:00"),
                 }))
               );
             }

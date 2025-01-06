@@ -12,13 +12,15 @@ import DateTimePicker from "../ui/forms/DateTimePicker";
 import { getUserFromLocalStorage } from "../utils/userLocalStorage";
 import toast from "react-hot-toast";
 
-import { revisarPeriodos } from "./contraints";
-import { revisarDisponibilidad } from "./constraints2";
-import { insertNewVacation } from "./insertVacation";
+import { validaciones } from "./functions/validaciones";
+import { insertarPropuesta } from "./functions/insertVacation";
 import { SiteData } from "../ui/ClientProvider";
 import { useState, useEffect } from "react";
 
-import { cerrarRegistro, siguienteEnLineaPorArea } from "./dbEntries";
+import {
+  cerrarRegistro,
+  siguienteEnLineaPorArea,
+} from "./functions/dbQuerys/dbEntries";
 import { useRouter } from "next/navigation";
 
 import dayjs from "dayjs";
@@ -33,20 +35,22 @@ const INITIAL_FORM_STATE = {
 };
 
 const FORM_VALIDATION = Yup.object().shape({
-  motivo: Yup.string().required("Required"),
-  fechaInicio: Yup.date().required("Required"),
-  fechaFin: Yup.date().required("Required"),
+  motivo: Yup.string().required("Requerido"),
+  fechaInicio: Yup.date().required("Requerido"),
+  fechaFin: Yup.date()
+    .min(Yup.ref("fechaInicio"), "Dia Fin no puede ser antes de Dia Inicio")
+    .required("Requerido"),
 });
 
 function page() {
   const [disabled, setDisabled] = useState(true);
-  const { userState, setUserState } = SiteData();
+  const { userReact, setUserReact } = SiteData();
   const router = useRouter();
 
-  //==============================Revisar antiguedad
+  //-- RevisarAntiguedad----------------------------------------------------
   useEffect(() => {
     const fetchData = async () => {
-      const user = await getUserFromLocalStorage();
+      const user = getUserFromLocalStorage();
       if (user) {
         const siguienteEnLinea = await siguienteEnLineaPorArea(user.area);
 
@@ -67,32 +71,22 @@ function page() {
     fetchData();
   }, []);
 
-  //==============================Entregar Propuesta
+  //-- Entregar Propuesta----------------------------------------------------
   const handleSubmit = async ({ motivo, fechaInicio, fechaFin }) => {
     const user = getUserFromLocalStorage();
 
     if (user) {
-      const isValid = await revisarPeriodos(
-        user,
-        motivo,
-        fechaInicio,
-        fechaFin
-      );
-      const isAvailable = await revisarDisponibilidad(
-        user,
-        fechaInicio,
-        fechaFin
-      );
+      const esValido = await validaciones(user, motivo, fechaInicio, fechaFin);
 
-      if (isValid && isAvailable) {
+      if (esValido) {
         try {
-          const updatedUser = await insertNewVacation(
+          const updatedUser = await insertarPropuesta(
             user,
             motivo,
             fechaInicio,
             fechaFin
           );
-          setUserState(updatedUser);
+          setUserReact(updatedUser);
           toast.success("Propuesta Registrada");
         } catch (error) {
           console.log(error);
@@ -105,6 +99,7 @@ function page() {
     }
   };
 
+  //-- Cerrar Registro----------------------------------------------------
   const handleCerrarRegistro = async () => {
     const userConfirmed = window.confirm(
       "¿Cerrar el registro? Una vez cerrado no podrás hacer más acciones"
@@ -132,11 +127,11 @@ function page() {
     >
       <Typography variant="overline">Solicitar Vacaciones</Typography>
 
-      {userState ? (
+      {userReact ? (
         <>
-          <Typography>Area: {userState.area}</Typography>
+          <Typography>Area: {userReact.area}</Typography>
           <Typography>
-            Fecha de Antiguedad: {dayjs(userState.antiguedad).format("DD-MMM")}
+            Fecha de Antiguedad: {dayjs(userReact.antiguedad).format("DD-MMM")}
           </Typography>
         </>
       ) : null}
@@ -153,7 +148,6 @@ function page() {
         <Form>
           <Grid container spacing={2} paddingY={"1rem"}>
             <Grid item xs={12}>
-              {/* <TextField name="motivo" label="Motivo" disabled={disabled} /> */}
               <Select
                 name="motivo"
                 label="Motivo"
