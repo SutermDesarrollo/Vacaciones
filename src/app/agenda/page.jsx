@@ -17,10 +17,7 @@ import { insertarPropuesta } from "./functions/insertVacation";
 import { SiteData } from "../ui/ClientProvider";
 import { useState, useEffect } from "react";
 
-import {
-  cerrarRegistro,
-  siguienteEnLineaPorArea,
-} from "./functions/dbQuerys/dbEntries";
+import { cerrarRegistro, siguienteEnLineaPorArea } from "./functions/dbQueries";
 import { useRouter } from "next/navigation";
 
 import dayjs from "dayjs";

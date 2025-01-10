@@ -1,9 +1,9 @@
 import supabase from "../../utils/supabaseClient";
 import { isFestividad } from "./constraints2";
-import { updateDiasDisponiblesDiasNuevos } from "../updateFields/updateFields";
+import { updateDiasDisponiblesDiasNuevos } from "./updateFields";
 
 import dayjs from "dayjs";
-import { auxDiasFestivos, auxTipoRol } from "./dbQuerys/dbEntries";
+import { auxDiasFestivos, auxTipoRol } from "./dbQueries";
 
 export async function calcularDiasPorDescontar(
   fechaInicio,

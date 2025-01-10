@@ -4,7 +4,7 @@ import {
   auxDiasFestivos,
   auxMaximaFaltantes,
   auxPropuestasEnArea,
-} from "./dbQuerys/dbEntries";
+} from "./dbQueries";
 
 export async function revisarDisponibilidad(user, fechaInicio, fechaFin) {
   let inicio = dayjs(fechaInicio);

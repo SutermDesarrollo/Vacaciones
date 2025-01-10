@@ -1,10 +1,6 @@
 import toast from "react-hot-toast";
 import { calcularDiasPorDescontar } from "./insertVacation";
-import {
-  auxDiasFestivos,
-  auxTipoRol,
-  maximoPeriodos,
-} from "./dbQuerys/dbEntries";
+import { auxDiasFestivos, auxTipoRol, maximoPeriodos } from "./dbQueries";
 
 //====================Aplicar Restricciones
 export async function revisarPeriodos(user, motivo, fechaInicio, fechaFin) {

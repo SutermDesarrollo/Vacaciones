@@ -21,12 +21,16 @@ import DateTimePicker from "../forms/DateTimePicker";
 import Button from "../forms/Button";
 import * as Yup from "yup";
 import { Formik, Form } from "formik";
+import { validaciones } from "../../agenda/functions/validaciones";
+import { insertarPropuesta } from "../../agenda/functions/insertVacation";
 
 export default function OptionsMenu({
   id,
   motivo,
   fechaInicio,
   fechaFin,
+  disponiblesConsumidos,
+  nuevosConsumidos,
   fetchSolicitudes,
 }) {
   // -- Yup Validation --------------------------------------------------------
@@ -120,9 +124,40 @@ export default function OptionsMenu({
   //== HandleSubmit =========================================================
 
   const handleSubmit = async ({ motivo, fechaInicio, fechaFin }) => {
-    console.log(motivo);
-    console.log(fechaInicio);
-    console.log(fechaFin);
+    const response = await supabase
+      .from("propuestas")
+      .delete()
+      .eq("id_propuesta", id);
+
+    //Regresar valores numericos
+    const user = getUserFromLocalStorage();
+    user.dias_solicitados =
+      user.dias_solicitados - disponiblesConsumidos - nuevosConsumidos;
+    user.dias_disponibles = user.dias_disponibles + disponiblesConsumidos;
+    user.dias_nuevos = user.dias_nuevos + nuevosConsumidos;
+    saveUserToLocalStorage(user);
+    setUserReact(user);
+
+    //Insertar
+    const esValido = await validaciones(user, motivo, fechaInicio, fechaFin);
+    if (esValido) {
+      try {
+        const updatedUser = await insertarPropuesta(
+          user,
+          motivo,
+          fechaInicio,
+          fechaFin
+        );
+        setUserReact(updatedUser);
+        toast.success("Propuesta Editada");
+      } catch (error) {
+        console.log(error);
+        toast.error(error.message);
+      }
+    }
+
+    setOpenModal(false);
+    fetchSolicitudes();
   };
 
   return (

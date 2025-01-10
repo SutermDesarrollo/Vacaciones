@@ -119,6 +119,8 @@ const TermCard = ({ Term, fetchSolicitudes }) => {
           motivo={Term.motivo}
           fechaInicio={Term.fecha_inicio}
           fechaFin={Term.fecha_fin}
+          disponiblesConsumidos={Term.disponibles_consumidos}
+          nuevosConsumidos={Term.nuevos_consumidos}
           fetchSolicitudes={fetchSolicitudes}
         />
       </div>
