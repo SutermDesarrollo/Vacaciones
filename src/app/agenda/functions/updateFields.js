@@ -1,3 +1,5 @@
+"use client";
+
 import {
   getUserFromLocalStorage,
   saveUserToLocalStorage,
@@ -8,18 +10,20 @@ export function updateDiasDisponiblesDiasNuevos(
   nuevosDiasNuevos,
   nuevosDiasSolicitados
 ) {
-  const user = getUserFromLocalStorage();
+  if (typeof window !== "undefined") {
+    const user = getUserFromLocalStorage();
 
-  if (user) {
-    //Cambios en localStorage
-    user.dias_disponibles = nuevosDiasDisponibles;
-    user.dias_nuevos = nuevosDiasNuevos;
-    user.dias_solicitados = nuevosDiasSolicitados;
-    saveUserToLocalStorage(user);
+    if (user) {
+      //Cambios en localStorage
+      user.dias_disponibles = nuevosDiasDisponibles;
+      user.dias_nuevos = nuevosDiasNuevos;
+      user.dias_solicitados = nuevosDiasSolicitados;
+      saveUserToLocalStorage(user);
 
-    //Cambios en Estado de React
-    return user;
-  } else {
-    console.log("No se encontro al usuario en el almacenamiento local");
+      //Cambios en Estado de React
+      return user;
+    } else {
+      console.log("No se encontro al usuario en el almacenamiento local");
+    }
   }
 }
