@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { cerrarRegistro } from "../../agenda/functions/dbQueries";
 import { getUserFromLocalStorage } from "../../utils/userLocalStorage";
