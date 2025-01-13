@@ -44,7 +44,7 @@ function page() {
   const { userReact, setUserReact } = SiteData();
   const router = useRouter();
 
-  //-- RevisarAntiguedad----------------------------------------------------
+  //-- Revisar Antiguedad----------------------------------------------------
   useEffect(() => {
     const fetchData = async () => {
       const user = getUserFromLocalStorage();
@@ -67,6 +67,7 @@ function page() {
         }
       } else {
         toast.error("No estas registrado", { id: "notLoggedIn" });
+        router.push("/login");
       }
     };
     fetchData();

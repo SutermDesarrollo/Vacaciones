@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { cerrarRegistro } from "../../agenda/functions/dbQueries";
 import { getUserFromLocalStorage } from "../../utils/userLocalStorage";
 import { Box, Button, Modal, Typography } from "@mui/material";
@@ -7,8 +8,10 @@ import toast from "react-hot-toast";
 
 function CerrarRegistro({ disabled }) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   const handleCerrarRegistro = async () => {
+    setOpen(false);
     const user = getUserFromLocalStorage();
 
     await cerrarRegistro(user.RPE);

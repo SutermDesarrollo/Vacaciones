@@ -4,12 +4,11 @@ import TermsList from "./TermsList";
 import Calendar from "./Calendar";
 import supabase from "../../utils/supabaseClient";
 import { getUserFromLocalStorage } from "../../utils/userLocalStorage";
+import toast from "react-hot-toast";
 
 const user = getUserFromLocalStorage();
 
 function Propuestas() {
-  //Falta arreglar un bug en linea 69(creo que es por ahi): user is not defined
-
   const [dataTermsList, setDataTermsList] = useState([]);
   const [dataCalendar, setDataCalendar] = useState([]);
 
@@ -67,7 +66,7 @@ function Propuestas() {
         throw new Error("No estas logeado");
       }
     } catch (error) {
-      toast.error(error.message);
+      console.log(error.message);
     }
   };
 
