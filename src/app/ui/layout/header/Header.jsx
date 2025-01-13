@@ -3,10 +3,10 @@ import {
   AppBar,
   Button,
   IconButton,
-  Link,
   Menu,
   MenuItem,
   Toolbar,
+  Typography,
 } from "@mui/material";
 import Logo from "../../../../../public/SutermLogo.png";
 import Image from "next/image";
@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { FaCircleUser } from "react-icons/fa6";
+import { FiLogOut } from "react-icons/fi";
 
 function Header() {
   const { userReact, setUserReact } = SiteData();
@@ -104,17 +105,30 @@ function Header() {
                 horizontal: "right",
               }}
             >
-              <MenuItem>{userReact.nombre}</MenuItem>
-              <MenuItem>
-                <Button variant="contained" onClick={handleLogout}>
-                  Logout
-                </Button>
+              <MenuItem style={{ whiteSpace: "normal" }}>
+                <Typography>{userReact.nombre}</Typography>
+              </MenuItem>
+              <MenuItem onClick={handleLogout}>
+                <div
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "2px solid red",
+                    borderRadius: "4px",
+                    color: "red",
+                  }}
+                >
+                  <FiLogOut style={{ verticalAlign: "bottom" }} />
+                  <Typography>Cerrar Sesión</Typography>
+                </div>
               </MenuItem>
             </Menu>
           </>
         ) : (
           <Button variant="contained" onClick={handleLogin}>
-            Login
+            Iniciar Sesión
           </Button>
         )}
       </Toolbar>

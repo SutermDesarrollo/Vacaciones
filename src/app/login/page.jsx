@@ -19,10 +19,10 @@ const INITIAL_FORM_STATE = {
 
 const FORM_VALIDATION = Yup.object().shape({
   rpe: Yup.string()
-    .required("Required")
-    .min(5, "Must be exactly 5 digits")
-    .max(5, "Must be exactly 5 digits"),
-  password: Yup.string().required("Required"),
+    .required("Campo Obligatorio")
+    .min(5, "El RPE debe de tener 5 dígitos")
+    .max(5, "El RPE debe de tener 5 dígitos"),
+  password: Yup.string().required("Campo Obligatorio"),
 });
 
 function LoginPage() {
@@ -84,6 +84,7 @@ function LoginPage() {
               <TextField
                 name="password"
                 label="Contraseña"
+                style={{ textTransform: "uppercase" }}
                 type={showPassword ? "text" : "password"}
               />
             </Grid>

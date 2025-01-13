@@ -1,76 +1,105 @@
 "use client ";
 import { Calendar, dayjsLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import "./calendar.css";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import { useEffect, useState } from "react";
+import { Box, Typography } from "@mui/material";
 dayjs.locale("es");
-
-import supabase from "../../../utils/supabaseClient";
-import { getUserFromLocalStorage } from "../../../utils/userLocalStorage";
 
 const localizer = dayjsLocalizer(dayjs);
 
-function CalendarComponent() {
-  const [propuestasList, setPropuestasList] = useState([]);
-
+function CalendarComponent({ dataCalendar }) {
+  const [eventos, setEventos] = useState(dataCalendar);
   useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      const user = getUserFromLocalStorage();
-      if (user) {
-        let fetchedPropuestas = [];
-        const { data: usuarios, error } = await supabase
-          .from("usuarios")
-          .select("RPE, nombre")
-          .eq("area", user.area)
-          .eq("registro_vacaciones", true);
-        if (error) {
-          throw new Error("Error en BD");
-        }
-        //Obtener usuarios en area que ya agendaron
-
-        if (usuarios) {
-          for (const usuario of usuarios) {
-            const { data: propuestas, error } = await supabase
-              .from("propuestas")
-              .select("fecha_inicio,fecha_fin")
-              .eq("rpe_usuario", usuario.RPE);
-            if (error) {
-              console.log(error);
-            }
-            if (propuestas) {
-              fetchedPropuestas = fetchedPropuestas.concat(
-                propuestas.map((propuesta) => ({
-                  title: usuario.nombre,
-                  start: new Date(propuesta.fecha_inicio + "T00:00:00-06:00"),
-                  end: new Date(propuesta.fecha_fin + "T23:59:59-06:00"),
-                }))
-              );
-            }
-          }
-          setPropuestasList(fetchedPropuestas);
-        }
-      } else {
-        throw new Error("No estas logeado");
-      }
-    } catch (error) {
-      console.log(error.message);
+    if (dataCalendar) {
+      setEventos(dataCalendar);
     }
+  }, [dataCalendar]);
+
+  const components = {
+    event: (props) => {
+      const { data } = props.event;
+      if (data.self) {
+        return (
+          <div
+            className="custom-event"
+            style={{ backgroundColor: "#745cd0" }}
+          ></div>
+        );
+      } else {
+        return (
+          <div
+            className="custom-event"
+            style={{ backgroundColor: "#fd9e35" }}
+          ></div>
+        );
+      }
+    },
   };
 
   return (
-    <div style={{ height: "600px" }}>
-      Propuestas registradas en tu departamento
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "1rem",
+        paddingTop: "1rem",
+        height: "450px",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          justifyContent: { md: "space-around" },
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: ".5rem",
+          }}
+        >
+          <div
+            style={{
+              height: "1rem",
+              width: "1rem",
+              borderRadius: "4px",
+              backgroundColor: "#745cd0",
+            }}
+          ></div>
+          <Typography>Tus Propuestas</Typography>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: ".5rem",
+          }}
+        >
+          <div
+            style={{
+              height: "1rem",
+              width: "1rem",
+              borderRadius: "4px",
+              backgroundColor: "#fd9e35",
+            }}
+          ></div>
+          <Typography>Propuestas del Departamento</Typography>
+        </div>
+      </Box>
       <Calendar
         localizer={localizer}
-        events={propuestasList}
+        events={eventos}
         startAccessor="start"
         endAccessor="end"
         views={["month", "day"]}
+        components={components}
       />
     </div>
   );

@@ -60,11 +60,6 @@ export default function OptionsMenu({
     setAnchorEl(null);
   };
 
-  const handleEditar = (id) => {
-    alert(`(Pendiente) Editar id: ${id}`);
-    handleClose();
-  };
-
   const handleEliminar = async (id) => {
     handleClose();
     //Recuperar antes de eliminar
@@ -209,10 +204,11 @@ export default function OptionsMenu({
             position: "absolute",
             top: "50%",
             left: "50%",
+            width: { xs: "90%", sm: "50%" },
             transform: "translate(-50%, -50%)",
             backgroundColor: "white",
             padding: "20px",
-            borderRadius: "8px",
+            borderRadius: "4px",
             boxShadow: 24,
           }}
         >

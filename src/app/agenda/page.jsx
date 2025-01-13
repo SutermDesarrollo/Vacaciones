@@ -5,7 +5,7 @@ import { Formik, Form } from "formik";
 import Button from "../ui/forms/Button";
 import Select from "../ui/forms/Select";
 import DisplayValues from "../ui/components/DisplayValues";
-import TermsList from "../ui/components/TermsList";
+import CerrarRegistro from "../ui/components/CerrarRegistro";
 import data from "../data/motivos.json";
 
 import DateTimePicker from "../ui/forms/DateTimePicker";
@@ -17,12 +17,12 @@ import { insertarPropuesta } from "./functions/insertVacation";
 import { SiteData } from "../ui/ClientProvider";
 import { useState, useEffect } from "react";
 
-import { cerrarRegistro, siguienteEnLineaPorArea } from "./functions/dbQueries";
+import { siguienteEnLineaPorArea } from "./functions/dbQueries";
 import { useRouter } from "next/navigation";
 
 import dayjs from "dayjs";
 import "dayjs/locale/es";
-import Calendar from "../ui/components/Calendar";
+import Propuestas from "../ui/components/Propuestas";
 dayjs.locale("es");
 
 const INITIAL_FORM_STATE = {
@@ -51,15 +51,19 @@ function page() {
       if (user) {
         const siguienteEnLinea = await siguienteEnLineaPorArea(user.area);
 
-        if (siguienteEnLinea.RPE === user.RPE) {
-          toast.success("Ingresa tus solicitudes", { id: "success" });
-          setDisabled(false);
+        if (siguienteEnLinea) {
+          if (siguienteEnLinea.RPE === user.RPE) {
+            toast.success("Ingresa tus solicitudes", { id: "success" });
+            setDisabled(false);
+          } else {
+            toast.error("Actualmente no puedes registrar", { id: "error1" });
+            toast.error(
+              `${siguienteEnLinea.nombre} del area: ${siguienteEnLinea.area} está en proceso de registro`,
+              { id: "error2" }
+            );
+          }
         } else {
-          toast.error("Actualmente no puedes registrar", { id: "error1" });
-          toast.error(
-            `${siguienteEnLinea.nombre} del area: ${siguienteEnLinea.area} está en proceso de registro`,
-            { id: "error2" }
-          );
+          toast.error("Actualmente no puedes registrar", { id: "error2" });
         }
       } else {
         toast.error("No estas registrado", { id: "notLoggedIn" });
@@ -93,21 +97,6 @@ function page() {
     } else {
       toast.success("No estas logeado");
       router.push("/login");
-    }
-  };
-
-  //-- Cerrar Registro----------------------------------------------------
-  const handleCerrarRegistro = async () => {
-    const userConfirmed = window.confirm(
-      "¿Cerrar el registro? Una vez cerrado no podrás hacer más acciones"
-    );
-
-    if (userConfirmed) {
-      const user = getUserFromLocalStorage();
-
-      await cerrarRegistro(user.RPE);
-      toast.success("Se cerro tu registro correctamente");
-      router.push("/");
     }
   };
 
@@ -174,22 +163,11 @@ function page() {
       </Formik>
 
       <Grid container spacing={2}>
-        <Grid item xs={12} overflow={"auto"}>
-          <TermsList />
+        <Grid item xs={12}>
+          <Propuestas />
         </Grid>
         <Grid item xs={12}>
-          <Calendar />
-        </Grid>
-        <Grid item xs={12}>
-          <Boton
-            variant="contained"
-            disabled={disabled}
-            fullWidth={true}
-            onClick={handleCerrarRegistro}
-            sx={{ backgroundColor: "#745cd0" }}
-          >
-            Cerrar Registro
-          </Boton>
+          <CerrarRegistro disabled={disabled} />
         </Grid>
       </Grid>
     </Container>

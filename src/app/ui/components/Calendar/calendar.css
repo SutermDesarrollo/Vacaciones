@@ -1,3 +1,12 @@
 .rbc-today {
-  background-color: #b399c4 !important;
+  background-color: #d8c1eb !important;
+}
+
+.rbc-event-allday {
+  background-color: transparent !important;
+}
+
+.custom-event {
+  border-radius: 4px;
+  height: 1rem;
 }

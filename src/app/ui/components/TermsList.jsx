@@ -11,82 +11,49 @@ import { FcCalendar } from "react-icons/fc";
 
 import OptionsMenu from "../components/OptionsMenu";
 
-export default function TermsList() {
-  const [solicitudes, setSolicitudes] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchSolicitudes = async () => {
-    const user = await getUserFromLocalStorage();
-    try {
-      const { data, error } = await supabase
-        .from("propuestas")
-        .select()
-        .eq("rpe_usuario", user.RPE);
-      if (error) {
-        throw new Error("Error en BD");
-      }
-
-      setSolicitudes(data);
-      setIsLoading(false);
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
+export default function TermsList({ dataTermsList, fetchPropuestas }) {
+  const [solicitudes, setSolicitudes] = useState(dataTermsList);
 
   useEffect(() => {
-    fetchSolicitudes();
-    supabase
-      .channel("todos")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "propuestas" },
-        (payload) => {
-          fetchSolicitudes();
-        }
-      )
-      .subscribe();
-  }, []);
+    if (dataTermsList) {
+      setSolicitudes(dataTermsList);
+    }
+  }, [dataTermsList]);
 
   return (
-    <>
-      {isLoading ? (
-        <p>Cargando...</p>
-      ) : (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "1rem",
-          }}
-        >
-          {solicitudes.length > 0 ? (
-            <>
-              Solicitudes
-              {solicitudes.map((element, index) => (
-                <div
-                  key={index}
-                  style={{
-                    backgroundColor: "#745cd0",
-                    borderRadius: "4px",
-                    padding: ".5rem",
-                  }}
-                >
-                  <TermCard
-                    index={index}
-                    Term={element}
-                    fetchSolicitudes={fetchSolicitudes}
-                  />
-                </div>
-              ))}
-            </>
-          ) : null}
-        </div>
-      )}
-    </>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "1rem",
+      }}
+    >
+      {solicitudes.length > 0 ? (
+        <>
+          Solicitudes
+          {solicitudes.map((element, index) => (
+            <div
+              key={index}
+              style={{
+                backgroundColor: "#745cd0",
+                borderRadius: "4px",
+                padding: ".5rem",
+              }}
+            >
+              <TermCard
+                index={index}
+                Term={element}
+                fetchPropuestas={fetchPropuestas}
+              />
+            </div>
+          ))}
+        </>
+      ) : null}
+    </div>
   );
 }
 
-const TermCard = ({ Term, fetchSolicitudes }) => {
+const TermCard = ({ Term, fetchPropuestas }) => {
   return (
     <div
       style={{
@@ -121,7 +88,7 @@ const TermCard = ({ Term, fetchSolicitudes }) => {
           fechaFin={Term.fecha_fin}
           disponiblesConsumidos={Term.disponibles_consumidos}
           nuevosConsumidos={Term.nuevos_consumidos}
-          fetchSolicitudes={fetchSolicitudes}
+          fetchSolicitudes={fetchPropuestas}
         />
       </div>
     </div>
