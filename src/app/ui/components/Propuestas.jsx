@@ -6,13 +6,12 @@ import supabase from "../../utils/supabaseClient";
 import { getUserFromLocalStorage } from "../../utils/userLocalStorage";
 import toast from "react-hot-toast";
 
-const user = getUserFromLocalStorage();
-
 function Propuestas() {
   const [dataTermsList, setDataTermsList] = useState([]);
   const [dataCalendar, setDataCalendar] = useState([]);
 
   const fetchPropuestas = async () => {
+    const user = getUserFromLocalStorage();
     try {
       if (user) {
         const { data: usuarios, error: errorUsuarios } = await supabase
@@ -78,6 +77,7 @@ function Propuestas() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "propuestas" },
         (payload) => {
+          const user = getUserFromLocalStorage();
           if (user) {
             if (payload.new.rpe_usuario == user.RPE) {
               fetchPropuestas();
