@@ -5,8 +5,12 @@ export const saveUserToLocalStorage = (user) => {
 
 // Función para obtener el usuario desde el localStorage
 export const getUserFromLocalStorage = () => {
-  const user = localStorage.getItem("user");
-  return user ? JSON.parse(user) : null;
+  if (typeof window !== "undefined") {
+    const user = localStorage.getItem("user")
+      ? JSON.parse(localStorage.getItem("user"))
+      : null;
+    return user;
+  }
 };
 
 export const removeUserFromLocalStorage = () => {
